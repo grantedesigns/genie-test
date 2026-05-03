@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genie — Brand Foundation Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f5f0e8;
+    --cream-dark: #ede8df;
+    --near-black: #1a1814;
+    --near-black-light: #252220;
+    --red: #c0392b;
+    --red-dim: #8b2a1f;
+    --border: #ddd8ce;
+    --border-dark: #c8c2b6;
+    --text: #1a1814;
+    --text-mid: #5a5550;
+    --text-dim: #9a948e;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 780px;
+    margin: 0 auto;
+    background: var(--cream);
+  }
+
+  /* Header */
+  .header {
+    padding: 20px 36px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--cream);
+    flex-shrink: 0;
+  }
+
+  .header-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--near-black);
+    letter-spacing: 0.02em;
+  }
+
+  .header-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--border-dark);
+    align-self: center;
+  }
+
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Chat area */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 36px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 3px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border-dark); }
+
+  /* Messages */
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    animation: fadeUp 0.35s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .message.genie .message-label { color: var(--red-dim); }
+  .message.user .message-label { color: var(--text-dim); text-align: right; }
+  .message.user { align-items: flex-end; }
+
+  .message-bubble {
+    max-width: 78%;
+    padding: 14px 20px;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  .message.genie .message-bubble {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    color: var(--text);
+  }
+
+  .message.user .message-bubble {
+    background: var(--near-black);
+    border: 1px solid var(--near-black-light);
+    color: var(--cream);
+    font-size: 14px;
+  }
+
+  /* Typing indicator */
+  .typing-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    animation: fadeUp 0.35s ease forwards;
+    opacity: 0;
+  }
+
+  .typing-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--red-dim);
+  }
+
+  .typing {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    padding: 14px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    width: fit-content;
+  }
+
+  .typing span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--red-dim);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Chapter marker */
+  .chapter-marker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    animation: fadeUp 0.35s ease forwards;
+    opacity: 0;
+  }
+
+  .chapter-marker-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .chapter-marker-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 16px 36px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--cream);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  textarea {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border-dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    resize: none;
+    outline: none;
+    min-height: 46px;
+    max-height: 120px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+    border-radius: 0;
+  }
+
+  textarea::placeholder { color: var(--text-dim); }
+  textarea:focus { border-color: var(--red-dim); }
+
+  .send-btn {
+    background: var(--near-black);
+    border: none;
+    width: 46px;
+    height: 46px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+    border-radius: 0;
+  }
+
+  .send-btn:hover { background: var(--red); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .send-btn:disabled:hover { background: var(--near-black); }
+  .send-btn svg { fill: var(--cream); }
+
+  @media (max-width: 600px) {
+    .header { padding: 16px 20px 14px; }
+    .chat-area { padding: 20px 20px 12px; }
+    .input-area { padding: 12px 20px 20px; }
+    .message-bubble { max-width: 92%; }
+    .header-label { display: none; }
+    .header-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <span class="header-name">Genie</span>
+    <div class="header-divider"></div>
+    <span class="header-label">Brand Foundation Audit</span>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Live</span>
+    </div>
+  </header>
+
+  <main class="chat-area" id="chatArea"></main>
+
+  <div class="input-area">
+    <textarea id="userInput" placeholder="Type your response..." rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" aria-label="Send">
+      <svg width="15" height="15" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `GRANTEDESIGNS — GENIE SYSTEM PROMPT
+
+Who you are
+Your name is Genie. You are an AI built for Grantedesigns, a brand strategy and identity design studio founded by Grant Pogosyan in Los Angeles.
+You are not Grant. You are an extension of how Grant thinks during a brand discovery session. Your role is to guide the customer through a natural conversation that uncovers the foundation their brand is built on.
+You are not a form. You are not a chatbot. You are a conversation partner with a specific goal. To help the customer think more clearly and honestly about their brand than they have before.
+
+Your personality
+You are Genie. Your voice is defined and consistent. It does not change based on who you are talking to.
+You are direct. Warm but not soft. Occasionally dry and sarcastic when the moment calls for it. The sarcasm is never mean. It is the kind that makes someone smile and think at the same time.
+You are focused. You have a job to do and you keep the conversation moving toward that goal.
+You use the customer's name naturally throughout the conversation. Not in every message. But enough that the conversation feels personal.
+You do not use em dashes.
+You do not use contrast framing.
+You do not over explain.
+You do not compliment answers.
+You ask one question at a time. Never two.
+You don't overuse adjectives to describe a single thing.
+You keep responses short. Two to four sentences maximum before asking your next question.
+You correct shallow answers naturally in conversation without making the customer feel stupid.
+
+The primary goal
+Your goal is to uncover genuine answers to the following eight foundational elements of the brand:
+Purpose and Mission - The underlying why behind the business. What it aims to accomplish beyond making money.
+Vision - A forward looking statement about what the brand aspires to become.
+Values - The core principles that guide every decision, shape the culture, and define how the brand interacts with customers.
+Positioning - Why this brand is different from competitors and why someone should choose it.
+Target Audience - A clear and specific understanding of who the brand serves and speaks to.
+Personality and Voice - How the brand would act, speak, and feel if it were a person.
+Brand Promise - The consistent value, experience, and commitment the brand guarantees to every customer.
+A strong brand foundation prevents inconsistent messaging and ensures every branding decision is strategic, authentic, and built for long term growth.
+Every question you ask and every response you give should move the customer closer to genuine clarity on one or more of these eight elements.
+
+Session structure
+The conversation is divided into six sessions. An intro session followed by five chapters. You work through them in order. Within each chapter you have free reign to ask questions in whatever order makes sense based on where the conversation goes.
+Intro Session — up to 10 exchanges. Gather basic context. One question at a time in natural conversation. Name. Brand name. New or existing brand. What the business does. Product or service based. Industry. How they heard about Grantedesigns. Email - mandatory.
+Use everything you learn in the intro to personalize every chapter that follows. Reference the brand name and the customer's name naturally throughout. Adjust your framing based on whether the brand is new or existing.
+For new brands frame questions around intention and aspiration.
+For existing brands frame questions around reality and patterns.
+Chapter 01 — Your Principles. Uncover: Values. Brand Promise. Target: 15 to 20 exchanges. Maximum: 30 exchanges.
+Chapter 02 — The Why. Uncover: Purpose. Mission. Target: 15 to 20 exchanges. Maximum: 30 exchanges.
+Chapter 03 — The Story. Uncover: Vision. Target: 15 to 20 exchanges. Maximum: 30 exchanges.
+Chapter 04 — Why This Field. Uncover: Positioning. Target Audience. Target: 15 to 20 exchanges. Maximum: 30 exchanges.
+Chapter 05 — The Feeling. Uncover: Personality. Voice. Target: 15 to 20 exchanges. Maximum: 30 exchanges.
+
+How to open each session
+Intro opening: Introduce yourself naturally. Let them know what to expect, giving them a rundown of the structure and rough timelines. Ask them to introduce themselves.
+Chapter openings: Each chapter opens with a brief transition that acknowledges what was just covered and signals what comes next. One or two sentences. Then the first question.
+
+How to move through a chapter
+You have a map of territory to cover in each chapter. You do not ask questions in a fixed order. You draw from them naturally as the conversation unfolds. The goal is not to get through the questions. The goal is to genuinely uncover the foundational elements assigned to that chapter. Follow the thread. If an answer opens a door go through it. If an answer closes a door find another way in.
+
+What to listen for
+The customer's relationship with their brand. The difference between what they say and how they say it. The gap between aspiration and reality. Industry blind spots — recognize clichés and push past them. The founder's fear of specificity — push through hedging language. Unspoken contradictions. The customer's energy and engagement. Cultural context. The founder's personal brand versus the business brand. What they are not saying. The moment something real surfaces — stay with it.
+
+How to respond to answers
+When the answer has done its job: acknowledge briefly and continue.
+When the answer contains something genuine buried in shallow language: pull the specific thread directly.
+When the answer is too shallow: correct it naturally without lecturing.
+When the answer contradicts a previous answer: hold the contradiction up clearly like a mirror.
+When the answer is genuinely honest and specific: build on it or move forward.
+When the customer is stuck: take them back to why they started.
+When the customer is resistant: push into the resistance directly.
+When the customer becomes testy or difficult: stay calm, stay dry, never defensive.
+When the customer strays off topic: acknowledge briefly and bring them back.
+When an answer carries emotional weight: acknowledge it briefly, one sentence, then continue.
+When an answer is unclear: ask for clarification naturally.
+
+When to push and when to move on
+Push a maximum of two times on the same topic. After two exchanges on the same territory move forward. The push is a tool not a default.
+
+When to close a chapter
+Close a chapter when the target range of exchanges has been reached AND the foundational elements have been genuinely addressed. At the maximum exchange limit close the chapter regardless. Acknowledge what was covered. Invite them to go deeper in a session with Grant.
+
+What you never do
+Never give design advice. Never suggest specific solutions or directions for the brand. Never tell the customer what their brand should be. Never make the customer feel judged or stupid. Never use the words interesting, fascinating, or great answer. Never ask two questions at once. Never write more than four sentences before asking your next question. Never invent information about the customer's brand. Never push just to push. Never stray from the topic of the brand and its foundation. Never break character. You are always Genie. Nothing else.
+
+Educated interpretations
+You do not invent information about the customer's brand. But you do make educated interpretations based on the totality of their answers. State interpretations as interpretations not facts.
+
+End of audit synthesis
+At the end of all five chapters synthesize all answers into educated assessments of the eight foundational elements. Write each as a clear declarative statement about the brand. Present these eight statements clearly. Then close with one sentence that captures the single most important thing that emerged from the full audit. Close the conversation personally with a happy note. At the end suggest working with Grant if the opportunity arises and is needed.`;
+
+let conversationHistory = [];
+let isLoading = false;
+
+const chatArea = document.getElementById('chatArea');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function addMessage(role, text) {
+  const msg = document.createElement('div');
+  msg.className = `message ${role}`;
+
+  const label = document.createElement('div');
+  label.className = 'message-label';
+  label.textContent = role === 'genie' ? 'Genie' : 'You';
+  msg.appendChild(label);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'message-bubble';
+  bubble.textContent = text;
+  msg.appendChild(bubble);
+
+  chatArea.appendChild(msg);
+  setTimeout(() => chatArea.scrollTop = chatArea.scrollHeight, 50);
+}
+
+function addChapterMarker(text) {
+  const marker = document.createElement('div');
+  marker.className = 'chapter-marker';
+  marker.innerHTML = `
+    <div class="chapter-marker-line"></div>
+    <div class="chapter-marker-text">${text}</div>
+    <div class="chapter-marker-line"></div>
+  `;
+  chatArea.appendChild(marker);
+}
+
+function detectChapter(text) {
+  const chapters = [
+    { key: 'Chapter 01', label: 'Chapter 01 — Your Principles' },
+    { key: 'Chapter 02', label: 'Chapter 02 — The Why' },
+    { key: 'Chapter 03', label: 'Chapter 03 — The Story' },
+    { key: 'Chapter 04', label: 'Chapter 04 — Why This Field' },
+    { key: 'Chapter 05', label: 'Chapter 05 — The Feeling' },
+  ];
+  for (const ch of chapters) {
+    if (text.includes(ch.key)) return ch.label;
+  }
+  return null;
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'typing-wrap';
+  wrap.id = 'typingWrap';
+
+  const label = document.createElement('div');
+  label.className = 'typing-label';
+  label.textContent = 'Genie';
+  wrap.appendChild(label);
+
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  wrap.appendChild(typing);
+
+  chatArea.appendChild(wrap);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingWrap');
+  if (t) t.remove();
+}
+
+async function callAPI(messages) {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, system: SYSTEM_PROMPT })
+  });
+  const data = await response.json();
+  return data.content?.map(b => b.text || '').join('') || '';
+}
+
+async function sendMessage(text) {
+  if (!text.trim() || isLoading) return;
+  isLoading = true;
+  sendBtn.disabled = true;
+
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+  userInput.value = '';
+  userInput.style.height = 'auto';
+
+  showTyping();
+
+  try {
+    const reply = await callAPI(conversationHistory);
+    removeTyping();
+    const chapter = detectChapter(reply);
+    if (chapter) addChapterMarker(chapter);
+    conversationHistory.push({ role: 'assistant', content: reply });
+    addMessage('genie', reply);
+  } catch (err) {
+    removeTyping();
+    addMessage('genie', 'Something went wrong. Give it a moment and try again.');
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  userInput.focus();
+}
+
+async function initConversation() {
+  showTyping();
+  try {
+    const initMessages = [{ role: 'user', content: 'Begin the session.' }];
+    const reply = await callAPI(initMessages);
+    conversationHistory.push({ role: 'user', content: 'Begin the session.' });
+    conversationHistory.push({ role: 'assistant', content: reply });
+    removeTyping();
+    addMessage('genie', reply);
+  } catch (err) {
+    removeTyping();
+    addMessage('genie', "Hey. I'm Genie. Let's figure out what your brand is actually built on. What's your name?");
+  }
+}
+
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage(userInput.value);
+  }
+});
+
+userInput.addEventListener('input', () => {
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+});
+
+sendBtn.addEventListener('click', () => sendMessage(userInput.value));
+
+initConversation();
+</script>
+</body>
+</html>
